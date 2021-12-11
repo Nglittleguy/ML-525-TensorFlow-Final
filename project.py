@@ -1,3 +1,11 @@
+def compute_confusion_matrix(true, pred):
+	K = len(np.unique(true)) # Number of classes
+	result = np.zeros((K, K))
+	for i in range(len(true)):
+		result[true[i]][pred[i]] += 1
+	return result
+
+
 import numpy as np
 import cv2
 import os
@@ -48,9 +56,9 @@ for filename in os.listdir(path):
 # img_list is (1123, 100, 100, 3), class_list is (1123, 1)
 
 img_train = []
-class_train = np.array();
+class_train = []
 img_test = []
-class_test = np.array();
+class_test = []
 
 permuted_idx = np.random.permutation(1123)
 for pIndex in permuted_idx[0:899]:
@@ -59,6 +67,21 @@ for pIndex in permuted_idx[0:899]:
 for pIndex in permuted_idx[900:]:
 	img_test.append(img_list[pIndex])
 	class_test.append(class_list[pIndex])
+
+img_train = np.array(img_train)
+class_train = np.array(class_train)
+img_test = np.array(img_test)
+class_test = np.array(class_test)
+
+class_train = np.expand_dims(class_train, axis=1)
+class_test = np.expand_dims(class_test, axis=1)
+
+print(np.shape(img_train))
+print(np.shape(class_train))
+print(type(img_train))
+print(type(class_train))
+print(class_test)
+
 
 # img_train(test), class_train(test) is randomized subsets of data
 
@@ -74,17 +97,26 @@ model.add(layers.Dense(10))
 model.compile(optimizer='adam',
               loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
               metrics=['accuracy'])
-history = model.fit(img_train, class_train, epochs=10, validation_data=(img_test, class_test))
-model.summary()
+history = model.fit(img_train, class_train, epochs=1, validation_data=(img_test, class_test))
 model.save('firstModel')
+model.summary()
 
-plt.plot(history.history['accuracy'], label='accuracy')
-plt.plot(history.history['val_accuracy'], label = 'val_accuracy')
-plt.xlabel('Epoch')
-plt.ylabel('Accuracy')
-plt.ylim([0.5,1])
-plt.legend(loc='lower right')
-plt.show()
+class_pred = model.predict(img_test)
+class_pred_table = 1*(class_pred>0.5)
+class_pred_table = class_pred_table.astype(int)
+class_pred_table = np.argmax(class_pred_table, 1);
+confusion_mx = compute_confusion_matrix(class_test, class_pred_table)
+print(confusion_mx)
+
+
+
+# plt.plot(history.history['accuracy'], label='accuracy')
+# plt.plot(history.history['val_accuracy'], label = 'val_accuracy')
+# plt.xlabel('Epoch')
+# plt.ylabel('Accuracy')
+# plt.ylim([0.5,1])
+# plt.legend(loc='lower right')
+# plt.show()
 
 test_loss, test_acc = model.evaluate(img_test, class_test, verbose=2)
 print(test_acc)
