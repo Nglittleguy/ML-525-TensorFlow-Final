@@ -1,10 +1,11 @@
 def compute_confusion_matrix(true, pred):
 	K = len(np.unique(true)) # Number of classes
 	result = np.zeros((K, K))
+	print(true)
+	print(pred)
 	for i in range(len(true)):
 		result[true[i]][pred[i]] += 1
 	return result
-
 
 import numpy as np
 import cv2
@@ -14,7 +15,6 @@ import tensorflow as tf
 import tensorflow.keras
 from tensorflow.keras import Model
 from tensorflow.keras import datasets, layers, models
-
 
 # Reading Dataset & Preprocessing
 path = "C:/Users/steph/Desktop/ML525/Final/dataset"
@@ -74,14 +74,15 @@ img_test = np.array(img_test)
 class_test = np.array(class_test)
 
 class_train = np.expand_dims(class_train, axis=1)
-class_test = np.expand_dims(class_test, axis=1)
+# class_test = np.expand_dims(class_test, axis=1)
 
+'''
 print(np.shape(img_train))
 print(np.shape(class_train))
 print(type(img_train))
 print(type(class_train))
 print(class_test)
-
+'''
 
 # img_train(test), class_train(test) is randomized subsets of data
 
@@ -93,33 +94,39 @@ model.add(layers.MaxPooling2D((2,2)))
 model.add(layers.Conv2D(64, (3,3), activation='relu'))
 model.add(layers.Flatten())
 model.add(layers.Dense(64,activation='relu'))
-model.add(layers.Dense(10))
+model.add(layers.Dense(4))
 model.compile(optimizer='adam',
               loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
               metrics=['accuracy'])
-history = model.fit(img_train, class_train, epochs=1, validation_data=(img_test, class_test))
+history = model.fit(img_train, class_train, epochs=10, validation_data=(img_test, class_test))
 model.save('firstModel')
 model.summary()
 
+
+
+# model = tf.keras.models.load_model('firstModel')
+
+
 class_pred = model.predict(img_test)
-class_pred_table = 1*(class_pred>0.5)
-class_pred_table = class_pred_table.astype(int)
-class_pred_table = np.argmax(class_pred_table, 1);
+class_pred_table = np.argmax(class_pred, 1)
 confusion_mx = compute_confusion_matrix(class_test, class_pred_table)
+print("Confusion Matrix")
 print(confusion_mx)
 
-
-
-# plt.plot(history.history['accuracy'], label='accuracy')
-# plt.plot(history.history['val_accuracy'], label = 'val_accuracy')
-# plt.xlabel('Epoch')
-# plt.ylabel('Accuracy')
-# plt.ylim([0.5,1])
-# plt.legend(loc='lower right')
-# plt.show()
-
 test_loss, test_acc = model.evaluate(img_test, class_test, verbose=2)
+print("Test Accuaracy")
 print(test_acc)
+
+
+plt.plot(history.history['accuracy'], label='accuracy')
+plt.plot(history.history['val_accuracy'], label = 'val_accuracy')
+plt.xlabel('Epoch')
+plt.ylabel('Accuracy')
+plt.ylim([0.5,1])
+plt.legend(loc='lower right')
+plt.show()
+
+
 
 
 
