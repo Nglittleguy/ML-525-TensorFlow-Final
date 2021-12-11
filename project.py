@@ -1,8 +1,6 @@
 def compute_confusion_matrix(true, pred):
 	K = len(np.unique(true)) # Number of classes
 	result = np.zeros((K, K))
-	print(true)
-	print(pred)
 	for i in range(len(true)):
 		result[true[i]][pred[i]] += 1
 	return result
