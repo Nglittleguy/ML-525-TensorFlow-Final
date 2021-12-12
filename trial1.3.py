@@ -85,11 +85,11 @@ print(class_test)
 # img_train(test), class_train(test) is randomized subsets of data
 
 model = models.Sequential()
-model.add(layers.Conv2D(100, (3, 3), activation='relu', input_shape=(100, 100, 3)))
+model.add(layers.Conv2D(100, (3, 3), activation='selu', input_shape=(100, 100, 3)))
 model.add(layers.MaxPooling2D((2,2)))
-model.add(layers.Conv2D(64, (3,3), activation='relu'))
+model.add(layers.Conv2D(64, (3,3), activation='selu'))
 model.add(layers.MaxPooling2D((2,2)))
-model.add(layers.Conv2D(64, (3,3), activation='relu'))
+model.add(layers.Conv2D(64, (3,3), activation='selu'))
 model.add(layers.Flatten())
 model.add(layers.Dense(64,activation='relu'))
 model.add(layers.Dense(4))
@@ -97,7 +97,7 @@ model.compile(optimizer='adam',
               loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
               metrics=['accuracy'])
 history = model.fit(img_train, class_train, epochs=10, validation_data=(img_test, class_test))
-model.save('model_1.0')
+model.save('model_1.3')
 model.summary()
 
 

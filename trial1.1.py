@@ -72,24 +72,14 @@ img_test = np.array(img_test)
 class_test = np.array(class_test)
 
 class_train = np.expand_dims(class_train, axis=1)
-# class_test = np.expand_dims(class_test, axis=1)
 
-'''
-print(np.shape(img_train))
-print(np.shape(class_train))
-print(type(img_train))
-print(type(class_train))
-print(class_test)
-'''
-
-# img_train(test), class_train(test) is randomized subsets of data
 
 model = models.Sequential()
-model.add(layers.Conv2D(100, (3, 3), activation='relu', input_shape=(100, 100, 3)))
+model.add(layers.Conv2D(100, (3, 3), activation='sigmoid', input_shape=(100, 100, 3)))
 model.add(layers.MaxPooling2D((2,2)))
-model.add(layers.Conv2D(64, (3,3), activation='relu'))
+model.add(layers.Conv2D(64, (3,3), activation='sigmoid'))
 model.add(layers.MaxPooling2D((2,2)))
-model.add(layers.Conv2D(64, (3,3), activation='relu'))
+model.add(layers.Conv2D(64, (3,3), activation='sigmoid'))
 model.add(layers.Flatten())
 model.add(layers.Dense(64,activation='relu'))
 model.add(layers.Dense(4))
@@ -97,11 +87,8 @@ model.compile(optimizer='adam',
               loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
               metrics=['accuracy'])
 history = model.fit(img_train, class_train, epochs=10, validation_data=(img_test, class_test))
-model.save('model_1.0')
+model.save('model_1.1')
 model.summary()
-
-
-# model = tf.keras.models.load_model('firstModel')
 
 
 class_pred = model.predict(img_test)
@@ -119,7 +106,7 @@ plt.plot(history.history['accuracy'], label='accuracy')
 plt.plot(history.history['val_accuracy'], label = 'val_accuracy')
 plt.xlabel('Epoch')
 plt.ylabel('Accuracy')
-plt.ylim([0.5,1])
+plt.ylim([0,1])
 plt.legend(loc='lower right')
 plt.show()
 
